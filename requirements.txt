@@ -1,0 +1,6 @@
+Django
+django-environ
+django-crispy-forms
+crispy-bootstrap5
+django-localflavor
+django-filter
