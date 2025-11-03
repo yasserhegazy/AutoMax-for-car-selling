@@ -57,7 +57,7 @@ To build a project like AutoMax, you would need a good understanding of the foll
 1.  **Clone the repository:**
 
     ```
-    git clone <repository-url>
+    git clone https://github.com/yasserhegazy/AutoMax-for-car-selling
     ```
 
 2.  **Create and activate a virtual environment:**
