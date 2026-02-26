@@ -2,73 +2,113 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block title %}AutoMax — Profile{% endblock %}
+
 {% block body %}
-<div class="container-fluid text-center py-5">
-    <div class="container px-4 py-5" id="hanging-icons">
+<main class="py-5">
+    <div class="container">
         <div class="row g-4">
-            <div class="col d-flex align-items-start">
-                <div>
-                    <h2 class="mb-3 border-bottom" style="color: black">Profile</h2>
-                </div>
-            </div>
-        </div>
-        <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-6">
-                    {{ user_form|crispy }}
-                    <!-- Render photo field manually -->
-                    <div class="form-group">
-                        <label>{{ profile_form.photo.label }}</label>
-                        {{ profile_form.photo }}
+            <!-- Profile Info Sidebar -->
+            <div class="col-12 col-lg-4">
+                <div class="profile-section text-center">
+                    {% if request.user.profile.photo %}
+                    <img src="{{ request.user.profile.photo.url }}" class="profile-photo mb-3" alt="Profile Photo">
+                    {% else %}
+                    <div class="profile-photo bg-secondary d-inline-flex align-items-center justify-content-center mb-3" style="width:120px; height:120px; border-radius:50%;">
+                        <i class="bi bi-person text-white" style="font-size:3rem;"></i>
                     </div>
-                    {{ profile_form.bio|as_crispy_field }}
-                    {{ profile_form.phone_number|as_crispy_field }}
+                    {% endif %}
+                    <h4 class="fw-bold mb-1">{{ request.user.get_full_name|default:request.user.username }}</h4>
+                    <p class="text-muted mb-2">@{{ request.user.username }}</p>
+                    {% if request.user.profile.bio %}
+                    <p class="text-muted small">{{ request.user.profile.bio }}</p>
+                    {% endif %}
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+                        <div class="text-center">
+                            <div class="fw-bold fs-5">{{ user_listings.count }}</div>
+                            <small class="text-muted">Listings</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="fw-bold fs-5">{{ user_liked_listings.count }}</div>
+                            <small class="text-muted">Liked</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6">
-                    {{ location_form|crispy }}
+
+                <!-- Your Listings -->
+                <div class="profile-section">
+                    <h3><i class="bi bi-car-front me-2"></i>Your Listings</h3>
+                    {% if user_listings %}
+                    <div class="list-group list-group-flush">
+                        {% for listing in user_listings %}
+                        <a href="{% url 'listing' id=listing.id %}" class="list-group-item list-group-item-action profile-listing-row d-flex justify-content-between align-items-center border-0 px-0">
+                            <div>
+                                <strong>{{ listing.model }}</strong>
+                                <br><small class="text-muted">{{ listing.brand|capfirst }} · {{ listing.year }}</small>
+                            </div>
+                            <span class="fw-bold" style="color: var(--primary);">${{ listing.price|floatformat:0 }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center small mb-0">No listings yet.
+                        <a href="{% url 'list' %}">Create one</a>
+                    </p>
+                    {% endif %}
                 </div>
-                <button class="btn btn-lg btn-danger" type="submit">Save</button>
+
+                <!-- Liked Listings -->
+                <div class="profile-section">
+                    <h3><i class="bi bi-heart me-2"></i>Liked Listings</h3>
+                    {% if user_liked_listings %}
+                    <div class="list-group list-group-flush">
+                        {% for liked_listing in user_liked_listings %}
+                        <a href="{% url 'listing' id=liked_listing.listing.id %}" class="list-group-item list-group-item-action profile-listing-row d-flex justify-content-between align-items-center border-0 px-0">
+                            <div>
+                                <strong>{{ liked_listing.listing.model }}</strong>
+                                <br><small class="text-muted">{{ liked_listing.listing.brand|capfirst }}</small>
+                            </div>
+                            <small class="text-muted">{{ liked_listing.like_date|timesince }} ago</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center small mb-0">No liked listings yet.</p>
+                    {% endif %}
+                </div>
             </div>
-        </form>
-    </div>
-    <div class="container px-4">
-        <div class="row g-4 py-5">
-            <div class="col d-flex align-items-start">
-                <div>
-                    <h2 class="mb-3 border-bottom" style="color: black">Your Listings</h2>
+
+            <!-- Edit Profile Form -->
+            <div class="col-12 col-lg-8">
+                <div class="profile-section">
+                    <h3><i class="bi bi-pencil-square me-2"></i>Edit Profile</h3>
+                    <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h6 class="fw-bold text-muted mb-3">Account Info</h6>
+                                {{ user_form|crispy }}
+                                <div class="form-group mb-3">
+                                    <label class="form-label">{{ profile_form.photo.label }}</label>
+                                    {{ profile_form.photo }}
+                                </div>
+                                {{ profile_form.bio|as_crispy_field }}
+                                {{ profile_form.phone_number|as_crispy_field }}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <h6 class="fw-bold text-muted mb-3">Location</h6>
+                                {{ location_form|crispy }}
+                            </div>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button class="btn btn-primary-automax" type="submit">
+                                <i class="bi bi-check-circle me-2"></i>Save Profile
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <table class="table table-hover">
-            <tbody>
-                {% for listing in user_listings %}
-                <tr>
-                    <td>{{ listing.id }}</td>
-                    <td>{{listing.model }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
-    <div class="container px-4">
-        <div class="row g-4 py-5">
-            <div class="col d-flex align-items-start">
-                <div>
-                    <h2 class="mb-3 border-bottom" style="color: black">Liked Listings</h2>
-                </div>
-            </div>
-        </div>
-        <table class="table table-hover">
-            <tbody>
-                {% for liked_listing in user_liked_listings %}
-                <tr>
-                    <td>{{ liked_listing.listing.model }}</td>
-                    <td>{{ liked_listing.like_date }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table> 
-    </div>
-</div>
+</main>
 {% endblock %}

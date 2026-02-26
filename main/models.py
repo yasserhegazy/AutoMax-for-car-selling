@@ -15,13 +15,15 @@ class Listing(models.Model):
     seller = models.ForeignKey(Profile, on_delete=models.CASCADE)
     brand = models.CharField(max_length=100, choices=CAR_BRANDS)
     model = models.CharField(max_length=64)
+    year = models.PositiveIntegerField(default=2024)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     vin = models.CharField(max_length=17, unique=True)
     mileage = models.IntegerField(default=0)
     color = models.CharField(max_length=24, default='white')
-    discription = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     engine = models.CharField(max_length=64)
     transmission = models.CharField(max_length=24, choices=TRANSMISSIONS_OPTIONS, default=None)
-    location = models.OneToOneField(Location, on_delete=models.CASCADE, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to=user_listing_path, blank=True, null=True)
 
     def __str__(self):
