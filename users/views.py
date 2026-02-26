@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .forms import UserForm, ProfileForm, LocationForm
+from .forms import UserForm, ProfileForm, LocationForm, RegisterForm
 from main.models import Listing, LikedListing
 
 def login_view(request):
@@ -38,21 +38,17 @@ def logout_view(request):
 # Register view
 class RegisterView(View):
     def get(self, request):
-        register_form = UserCreationForm()
+        register_form = RegisterForm()
         return render(request, 'views/register.html', {'register_form': register_form})
 
     def post(self, request):
-        register_form = UserCreationForm(request.POST)
+        register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             user = register_form.save()
-            # Automatically log in the user after registration
             user.refresh_from_db()
             login(request, user)
-            # Optionally, you can add a success message
-            messages.success(request, f'Account created for {user.username}! And you are logged in now.')
+            messages.success(request, f'Account created for {user.username}! Welcome to AutoMax.')
             return redirect('home')
-        else:
-            messages.error(request, 'Please correct the error below.')
         return render(request, 'views/register.html', {'register_form': register_form})
     
 # profile view
