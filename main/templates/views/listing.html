@@ -2,104 +2,178 @@
 {% load static %}
 
 {% block title %}
-    AutoMax. {{ listing.model }} Listing
+    AutoMax · {{ listing.model }}
 {% endblock title %}
     
 {% block body %}
-    <main>
-        <section class="container col-xxl-8 px-4 py-5">
-            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-                <div class="col-10 col-sm-8 col-lg-6">
-                    <img src="{{ listing.image.url }}" class="d-block mx-lg-auto img-fluid" width="1920" height="1080"
-                        loading="lazy">
+<main class="py-5">
+    <div class="container">
+        <!-- Back navigation -->
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm mb-4">
+            <i class="bi bi-arrow-left me-1"></i>Back to Listings
+        </a>
+
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-12 col-lg-8">
+                <!-- Image -->
+                <div class="listing-hero-img mb-4">
+                    {% if listing.image %}
+                    <img src="{{ listing.image.url }}" alt="{{ listing.model }}">
+                    {% else %}
+                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height:400px; border-radius: var(--radius);">
+                        <i class="bi bi-car-front text-white" style="font-size:5rem;"></i>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-lg-6">
-                    <h1 class="display-5 fw-bold lh-1 mb-3">{{ listing.model }}</h1>
-                    <p class="lead">{{ listing.seller.user.username }} - {{ listing.updated_at }}</p>
+
+                <!-- Title & Price -->
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
+                    <div>
+                        <h1 class="section-title mb-1">{{ listing.model }}</h1>
+                        <p class="text-muted mb-0">
+                            {{ listing.brand|capfirst }} · {{ listing.year }} · Listed by 
+                            <strong>{{ listing.seller.user.username }}</strong>
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-2 fw-bold" style="color: var(--primary);">${{ listing.price|floatformat:0 }}</div>
+                        <small class="text-muted">{{ listing.updated_at|timesince }} ago</small>
+                    </div>
                 </div>
+
+                <!-- Auto Information -->
+                <div class="profile-section">
+                    <h3><i class="bi bi-info-circle me-2"></i>Vehicle Details</h3>
+                    <table class="table info-table mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Brand</th>
+                                <td>{{ listing.brand|capfirst }}</td>
+                                <th>Year</th>
+                                <td>{{ listing.year }}</td>
+                            </tr>
+                            <tr>
+                                <th>VIN</th>
+                                <td>{{ listing.vin }}</td>
+                                <th>Mileage</th>
+                                <td>{{ listing.mileage|floatformat:0 }} mi</td>
+                            </tr>
+                            <tr>
+                                <th>Color</th>
+                                <td>{{ listing.color|capfirst }}</td>
+                                <th>Engine</th>
+                                <td>{{ listing.engine }}</td>
+                            </tr>
+                            <tr>
+                                <th>Transmission</th>
+                                <td colspan="3">{{ listing.transmission|capfirst }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Description -->
+                {% if listing.description %}
+                <div class="profile-section">
+                    <h3><i class="bi bi-text-paragraph me-2"></i>Description</h3>
+                    <p class="text-muted mb-0">{{ listing.description }}</p>
+                </div>
+                {% endif %}
             </div>
-        </section>
-        <div class="bg-light">
-            <div class="container px-4 py-5">
-                <h2 class="mb-3 border-bottom" style="color: black">Auto Information</h2>
-                <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-                    <div class="col-lg-8">
-                        <div class="table-responsive">
-                            <table class="table text-center">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row" class="text-start">Brand</th>
-                                        <td> {{listing.brand|capfirst }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-start">Vin</th>
-                                        <td> {{listing.vin }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-start">Mileage</th>
-                                        <td> {{listing.mileage }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-start">Color</th>
-                                        <td> {{listing.color }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-start">Engine</th>
-                                        <td> {{listing.engine }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-start">Transmisson</th>
-                                        <td> {{listing.transmission|capfirst }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+
+            <!-- Sidebar -->
+            <div class="col-12 col-lg-4">
+                <div class="seller-card card">
+                    <div class="card-header py-3 text-center">
+                        <h5 class="my-0 fw-bold"><i class="bi bi-person-circle me-2"></i>Contact Seller</h5>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h4 class="my-0 fw-normal">Location</h4>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>{{ listing.location.city }}, {{ listing.location.state }},
-                                        {{listing.location.zip_code }} </li>
-                                </ul>
-                                <button
-                                    class="w-100 btn btn-lg btn-outline-primary my-3">{{listing.seller.phone_number}}</button>
-                                <button id="sendEmail" class="w-100 btn btn-lg btn-outline-primary">Send Email</button>
-                            </div>
+                    <div class="card-body p-4">
+                        <div class="text-center mb-3">
+                            {% if listing.seller.photo %}
+                            <img src="{{ listing.seller.photo.url }}" class="rounded-circle mb-2"
+                                 width="64" height="64" style="object-fit: cover;">
+                            {% endif %}
+                            <h6 class="fw-bold mb-0">{{ listing.seller.user.username }}</h6>
                         </div>
+
+                        {% if listing.location %}
+                        <div class="d-flex align-items-center gap-2 mb-3 text-muted">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ listing.location.city }}, {{ listing.location.state }} {{ listing.location.zip_code }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if listing.seller.phone_number %}
+                        <a href="tel:{{ listing.seller.phone_number }}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-telephone me-2"></i>{{ listing.seller.phone_number }}
+                        </a>
+                        {% endif %}
+
+                        <button id="sendEmail" class="btn btn-primary-automax w-100">
+                            <i class="bi bi-envelope me-2"></i>Send Email Inquiry
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="container px-4 py-5">
-                <div class="row g-4 py-5">
-                    <div class="col d-flex align-items-start">
-                        <div>
-                            <h2 class="mb-3 border-bottom" style="color: black">Description</h2>
-                            <p> {{ listing.discription }}</p>
-                        </div>
-                    </div>
+
+                {% if listing.seller.user == request.user %}
+                <div class="mt-3">
+                    <a href="{% url 'edit' id=listing.id %}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-pencil me-2"></i>Edit Listing
+                    </a>
+                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-2"></i>Delete Listing
+                    </button>
                 </div>
+                {% endif %}
             </div>
         </div>
-    </main>
-    <script>
-        $("#sendEmail").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{% url 'inquire_listing' id=listing.id %}",
-                data: { 'csrfmiddlewaretoken': '{{ csrf_token }}' },
-                dataType: "json",
-                success: function (r) {
-                    alert("Email sent successfully!")
-                },
-                error: function (rs, e) {
-                    alert(rs.info)
-                }
-            })
+    </div>
+</main>
+
+{% if listing.seller.user == request.user %}
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Listing</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ listing.model }}</strong>? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'delete_listing' id=listing.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $("#sendEmail").click(function () {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-2"></i>Sending...');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'inquire_listing' id=listing.id %}",
+            data: { 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+            dataType: "json",
+            success: function (r) {
+                btn.html('<i class="bi bi-check-circle me-2"></i>Email Sent!').addClass('btn-success').removeClass('btn-primary-automax');
+            },
+            error: function () {
+                btn.prop('disabled', false).html('<i class="bi bi-envelope me-2"></i>Send Email Inquiry');
+            }
         });
-    </script>
+    });
+</script>
 {% endblock %}
     

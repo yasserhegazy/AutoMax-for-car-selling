@@ -34,7 +34,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('home')
+    return redirect('main')
 # Register view
 class RegisterView(View):
     def get(self, request):
@@ -43,7 +43,6 @@ class RegisterView(View):
 
     def post(self, request):
         register_form = UserCreationForm(request.POST)
-        print(register_form.__class__)
         if register_form.is_valid():
             user = register_form.save()
             # Automatically log in the user after registration
